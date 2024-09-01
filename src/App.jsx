@@ -1,35 +1,36 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useDispatch, useSelector } from "react-redux";
+import { FETCH_DATA_SAGA } from "./features/sagas/actionTypes";
+import { useEffect } from "react";
+import { selectIsLoading, selectTasks } from "./features/todos/todosSelector";
+import ClearButton from "./components/ClearButton/ClearButton";
+import TodosForm from "./components/TodosForm/TodosForm";
+import TodosList from "./components/TodosList/TodosList";
+import "./App.css";
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const tasks = useSelector(selectTasks);
+  const isLoading = useSelector(selectIsLoading);
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch({ type: FETCH_DATA_SAGA });
+  }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div className="app">
+      <TodosForm />
+      {isLoading && (
+        <div className="todos_inner_empty">
+          <p className="todos_inner_empty_text">
+            <span className="todos_inner_empty_span">Loading...</span>
+          </p>
+        </div>
+      )}
+      {tasks.length !== null && <TodosList />}
+      <ClearButton />
+    </div>
+  );
+};
 
-export default App
+export default App;
